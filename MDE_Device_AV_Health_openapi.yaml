@@ -16,34 +16,39 @@ paths:
       summary: Get Microsoft Defender Antivirus health details
       description: >
         Retrieves device-level Microsoft Defender Antivirus health information.
-        Use the $filter parameter to reduce the response before it reaches Security Copilot.
-        Examples:
-          avIsSignatureUpToDate eq 'False'
-          avIsEngineUpToDate eq 'False'
-          avIsPlatformUpToDate eq 'False'
-          computerDnsName eq 'DEVICE01'
-          avMode eq '1'
+        Use $filter to reduce the response before it reaches Security Copilot.
       parameters:
         - name: $filter
           in: query
           required: false
           description: >
-            OData filter evaluated by the Microsoft Defender API.
-            Prefer this whenever the user asks for a subset of devices.
-            Example: avIsSignatureUpToDate eq 'False'
+            OData filter evaluated by Microsoft Defender for Endpoint.
+            Supported examples include:
+            avIsSignatureUpToDate eq 'False'
+            avIsEngineUpToDate eq 'False'
+            avIsPlatformUpToDate eq 'False'
+            computerDnsName eq 'DEVICE01'
           schema:
             type: string
         - name: $top
           in: query
           required: false
           description: >
-            Maximum number of records to return in this request.
-            Use a small value for interactive Copilot queries when possible.
+            Maximum number of records to return. Microsoft documents a maximum
+            value of 10000 for this JSON endpoint. Prefer a small value for
+            interactive Copilot queries.
           schema:
             type: integer
             minimum: 1
-            maximum: 200000
+            maximum: 10000
             default: 20
+        - name: $skip
+          in: query
+          required: false
+          description: Number of records to skip for paging.
+          schema:
+            type: integer
+            minimum: 0
       responses:
         "200":
           description: Device antivirus health details
