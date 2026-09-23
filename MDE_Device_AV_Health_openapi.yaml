@@ -1,0 +1,137 @@
+openapi: 3.0.1
+info:
+  title: Microsoft Defender Antivirus Device Health API
+  version: "1.0"
+  description: >
+    Read-only API for retrieving Microsoft Defender Antivirus health information
+    for devices from Microsoft Defender for Endpoint.
+
+servers:
+  - url: https://api.security.microsoft.com
+
+paths:
+  /api/deviceavinfo:
+    get:
+      operationId: getDeviceAntivirusHealth
+      summary: Get Microsoft Defender Antivirus health details
+      description: >
+        Retrieves device-level Microsoft Defender Antivirus health information.
+        Use the $filter parameter to reduce the response before it reaches Security Copilot.
+        Examples:
+          avIsSignatureUpToDate eq 'False'
+          avIsEngineUpToDate eq 'False'
+          avIsPlatformUpToDate eq 'False'
+          computerDnsName eq 'DEVICE01'
+          avMode eq '1'
+      parameters:
+        - name: $filter
+          in: query
+          required: false
+          description: >
+            OData filter evaluated by the Microsoft Defender API.
+            Prefer this whenever the user asks for a subset of devices.
+            Example: avIsSignatureUpToDate eq 'False'
+          schema:
+            type: string
+        - name: $top
+          in: query
+          required: false
+          description: >
+            Maximum number of records to return in this request.
+            Use a small value for interactive Copilot queries when possible.
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 200000
+            default: 20
+      responses:
+        "200":
+          description: Device antivirus health details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  "@odata.context":
+                    type: string
+                  "@odata.nextLink":
+                    type: string
+                    description: URL for the next page when additional results exist.
+                  value:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DeviceAvInfo"
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "429":
+          description: Too many requests
+
+components:
+  schemas:
+    DeviceAvInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        machineId:
+          type: string
+        computerDnsName:
+          type: string
+        osKind:
+          type: string
+        osPlatform:
+          type: string
+        osVersion:
+          type: string
+        avMode:
+          type: string
+        avSignatureVersion:
+          type: string
+        avEngineVersion:
+          type: string
+        avPlatformVersion:
+          type: string
+        lastSeenTime:
+          type: string
+          format: date-time
+        quickScanResult:
+          type: string
+        quickScanError:
+          type: string
+        quickScanTime:
+          type: string
+          nullable: true
+        fullScanResult:
+          type: string
+        fullScanError:
+          type: string
+        fullScanTime:
+          type: string
+          nullable: true
+        dataRefreshTimestamp:
+          type: string
+          format: date-time
+        avEngineUpdateTime:
+          type: string
+          nullable: true
+        avSignatureUpdateTime:
+          type: string
+          nullable: true
+        avPlatformUpdateTime:
+          type: string
+          nullable: true
+        avIsSignatureUpToDate:
+          type: string
+        avIsEngineUpToDate:
+          type: string
+        avIsPlatformUpToDate:
+          type: string
+        avSignaturePublishTime:
+          type: string
+          nullable: true
+        rbacGroupName:
+          type: string
+        rbacGroupId:
+          type: integer
